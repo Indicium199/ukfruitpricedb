@@ -1,7 +1,3 @@
-# Import packages
-import sys
-print(sys.path)
-
 from dash import Dash, dcc, Output, Input
 import dash_bootstrap_components as dbc
 import plotly.express as px
