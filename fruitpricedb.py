@@ -88,6 +88,7 @@ def update_apple_graph(apples_selected):
     fig = px.line(df_filtered, x='date', y='price', color='variety')
 
     fig.update_layout(
+        title="🍎 UK Homegrown Apple Price Trends Over Time",  # Add title to the chart
         yaxis_title="Price in £",
         xaxis_title="Date",
         legend_title_text='Apple Variety'
@@ -104,6 +105,7 @@ def update_berry_graph(berry_selected):
     fig = px.line(df_filtered, x='date', y='price', color='variety')
 
     fig.update_layout(
+        title="🍒 UK Homegrown Berry Price Trends Over Time",
         yaxis_title="Price in £",
         xaxis_title="Date",
         legend_title_text='Berry Variety'
