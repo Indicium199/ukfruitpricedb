@@ -23,10 +23,20 @@ df['date'] = pd.to_datetime(df['date'])
 
 # Create a DataFrame for apples and another for berries
 applesdf = df[df['item'].str.contains('apple', case=False, na=False)].copy()  # Filtering apples
-dfBerry = df[df['item'].isin(['blackberries', 'raspberries', 'blueberries', 'strawberries'])].copy()  # Filtering berries
+dfBerry = df[df['item'].isin(['blackberries', 'raspberries', 'blueberries', 'strawberries', 'cherries', 'gooseberries', 'currants'])].copy()  # Filtering berries
 
 # Create 'Berry Variety' column using .loc[] to avoid the SettingWithCopyWarning
 dfBerry['berryVariety'] = dfBerry['variety'].str.replace('_', ' ').str.capitalize()
+
+# Modify the berry variety names specifically for currants and cherries
+# Add a 'berryVariety' column to handle display names
+dfBerry['berryVariety'] = dfBerry['variety'].str.replace('_', ' ').str.capitalize()
+
+# Custom replacements for currants and cherries
+dfBerry.loc[(dfBerry['variety'].str.contains('red', case=False)) & (dfBerry['item'] == 'currants'), 'berryVariety'] = 'Red Currants'
+dfBerry.loc[(dfBerry['variety'].str.contains('black', case=False)) & (dfBerry['item'] == 'currants'), 'berryVariety'] = 'Black Currants'
+dfBerry.loc[dfBerry['item'] == 'cherries', 'berryVariety'] = 'Cherries'  # Explicitly set to "Cherries"
+
 
 # Instantiate the App
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
@@ -107,4 +117,5 @@ def update_berry_graph(berry_selected):
 
 if __name__ == '__main__':
     app.run_server(debug=True)
+
 
