@@ -1,16 +1,18 @@
-from dash import Dash, dcc, Output, Input
-import dash_bootstrap_components as dbc
-import plotly.express as px
-import pandas as pd
+# Import libraries & components for Dash application
+from dash import Dash, dcc, Output, Input  # Core components & callback utilities
+import dash_bootstrap_components as dbc  # Bootstrap components for styling
+import plotly.express as px  # Plotly Express for easy plotting
+import pandas as pd  # Pandas for data manipulation
 import numpy as np  # Import NumPy
-import plotly.io as pio
+import plotly.io as pio  # Plotly IO to configure rendering settings
 
-pio.renderers.default = 'notebook_connected'  # or 'notebook_connected'
+# Set the default renderer for Plotly to 'notebook_connected' 
+pio.renderers.default = 'notebook_connected'  
 
 # Load the dataset directly from the website
 url = 'https://assets.publishing.service.gov.uk/media/67121ccf386bf0964853d787/fruitvegprices-20241028.csv'
-col_names = ['category', 'item', 'variety', 'date', 'price', 'unit']
-df = pd.read_csv(url, sep=',', usecols=col_names)
+col_names = ['category', 'item', 'variety', 'date', 'price', 'unit']  # Specify the column names to be used from the CSV file
+df = pd.read_csv(url, sep=',', usecols=col_names)  # Read the CSV file into a Pandas DataFrame, using only the specified columns
 
 # Convert columns to appropriate data types
 df['category'] = df['category'].astype('category')
@@ -33,6 +35,11 @@ dfBerry.loc[(dfBerry['variety'].str.contains('red', case=False)) & (dfBerry['ite
 dfBerry.loc[(dfBerry['variety'].str.contains('black', case=False)) & (dfBerry['item'] == 'currants'), 'berryVariety'] = 'Black Currants'
 dfBerry.loc[dfBerry['item'] == 'cherries', 'berryVariety'] = 'Cherries'  # Explicitly set to "Cherries"
 
+# Pears DataFrame
+dfPears = df[df['item'].str.contains('pear', case=False, na=False)].copy()
+
+# Plums DataFrame
+dfPlums = df[df['item'].str.contains('plum', case=False, na=False)].copy()
 
 # Instantiate the App
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
@@ -75,8 +82,44 @@ app.layout = dbc.Container([
         dbc.Col([
             dcc.Graph(id='figure2')
         ], width=8)
+    ]),
+
+# Pear Section
+    dbc.Row([
+        dbc.Col([
+            dcc.Dropdown(
+                id='pearVariety',
+                options=[{'label': x, 'value': x} for x in dfPears['variety'].unique()],
+                placeholder="Select a Pear Variety",
+                multi=True,
+                value=[dfPears['variety'].unique()[0]]  # Default selection
+            )
+        ], width=8)
+    ]),
+    dbc.Row([
+        dbc.Col([
+            dcc.Graph(id='figure3')
+        ], width=8)
+    ]),
+# Plum Section
+    dbc.Row([
+        dbc.Col([
+            dcc.Dropdown(
+                id='plumVariety',
+                options=[{'label': x, 'value': x} for x in dfPlums['variety'].unique()],
+                placeholder="Select a Plum Variety",
+                multi=True,
+                value=[dfPlums['variety'].unique()[0]]
+            )
+        ], width=8)
+    ]),
+    dbc.Row([
+        dbc.Col([
+            dcc.Graph(id='figure4')
+        ], width=8)
     ])
 ])
+
 
 # Configure Callbacks
 @app.callback(
@@ -111,6 +154,36 @@ def update_berry_graph(berry_selected):
         legend_title_text='Berry Variety'
     )
 
+    return fig
+
+@app.callback(
+    Output('figure3', 'figure'),
+    Input('pearVariety', 'value')
+)
+def update_pear_graph(pears_selected):
+    df_filtered = dfPears[dfPears['variety'].isin(pears_selected)]
+    fig = px.line(df_filtered, x='date', y='price', color='variety')
+    fig.update_layout(
+        title="🍐 UK Homegrown Pear Price Trends Over Time",
+        yaxis_title="Price in £",
+        xaxis_title="Date",
+        legend_title_text='Pear Variety'
+    )
+    return fig
+
+@app.callback(
+    Output('figure4', 'figure'),
+    Input('plumVariety', 'value')
+)
+def update_plum_graph(plums_selected):
+    df_filtered = dfPlums[dfPlums['variety'].isin(plums_selected)]
+    fig = px.line(df_filtered, x='date', y='price', color='variety')
+    fig.update_layout(
+        title="🍑 UK Homegrown Plum Price Trends Over Time",
+        yaxis_title="Price in £",
+        xaxis_title="Date",
+        legend_title_text='Plum Variety'
+    )
     return fig
 
 if __name__ == '__main__':
