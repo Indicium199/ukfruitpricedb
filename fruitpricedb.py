@@ -10,7 +10,7 @@ import plotly.io as pio  # Plotly IO to configure rendering settings
 pio.renderers.default = 'notebook_connected'  
 
 # Load the dataset directly from the website
-url = 'https://assets.publishing.service.gov.uk/media/67121ccf386bf0964853d787/fruitvegprices-20241028.csv'
+url = 'https://assets.publishing.service.gov.uk/media/675c178e98302e574b91533f/fruitvegprices-241216.csv'
 col_names = ['category', 'item', 'variety', 'date', 'price', 'unit']  # Specify the column names to be used from the CSV file
 df = pd.read_csv(url, sep=',', usecols=col_names)  # Read the CSV file into a Pandas DataFrame, using only the specified columns
 
